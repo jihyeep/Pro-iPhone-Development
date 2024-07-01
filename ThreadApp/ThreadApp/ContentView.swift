@@ -16,15 +16,32 @@ struct ContentView: View {
         VStack {
             Button("Click Me") {
                 let startTime = NSDate()
-                let fetchedData = fetchSomethingFromServer()
-                let processedData = processData(fetchedData)
-                let firstResult = calculateFirstResult(processedData)
-                let secondResult = calculateSecondResult(processedData)
-                let resultsSummary = "First: [\(firstResult)]\nSecond: [\(secondResult)]"
-                results = resultsSummary
-                
-                let endTime = NSDate()
-                message = "Completed in \(endTime.timeIntervalSince(startTime as Date)) seconds."
+                // 아랫 부분이 오래 걸리는 작업이므로 동시 실행
+                let queue = DispatchQueue.global(qos: .default) /// qos: 우선순위
+                queue.async {
+                    let fetchedData = fetchSomethingFromServer()
+                    let processedData = processData(fetchedData)
+                    
+                    var firstResult: String!
+                    var secondResult: String!
+                    // 그룹을 만들어서 동시 실행
+                    let group = DispatchGroup()
+                    
+                    queue.async(group: group) {
+                        firstResult = calculateFirstResult(processedData)
+                    }
+                    queue.async(group: group) {
+                        secondResult = calculateSecondResult(processedData)
+                    }
+                    
+                    group.notify(queue: queue) {
+                        let resultsSummary = "First: [\(firstResult!)]\nSecond: [\(secondResult!)]"
+                        results = resultsSummary
+                        
+                        let endTime = NSDate()
+                        message = "Completed in \(endTime.timeIntervalSince(startTime as Date)) seconds."
+                    }
+                }
             }
             TextEditor(text: $results)
             Slider(value: $sliderValue)
