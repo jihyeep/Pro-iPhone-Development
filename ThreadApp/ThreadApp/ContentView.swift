@@ -34,6 +34,7 @@ struct ContentView: View {
                         secondResult = calculateSecondResult(processedData)
                     }
                     
+                    // 그룹으로 묶여있는 것들 중 최종완료 시점에 notify가 실행됨
                     group.notify(queue: queue) {
                         let resultsSummary = "First: [\(firstResult!)]\nSecond: [\(secondResult!)]"
                         results = resultsSummary
