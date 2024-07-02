@@ -13,9 +13,10 @@ struct PersistenceController {
     static var preview: PersistenceController = {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
-        for _ in 0..<10 {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
+        for index in 0..<10 {
+            let newAnimal = Animal(context: viewContext)
+            newAnimal.name = "animal \(index)"
+            newAnimal.breed = "-"
         }
         do {
             try viewContext.save()
@@ -52,5 +53,40 @@ struct PersistenceController {
             }
         })
         container.viewContext.automaticallyMergesChangesFromParent = true
+    }
+    
+    // MARK: - 동동동대문을 열어라~
+    // Create
+    func savePet(name: String, breed: String) {
+        let pet = Animal(context: persistentContainer.viewContext) /// 열고
+        pet.name = name
+        pet.breed = breed
+        do {
+            try persistentContainer.viewContext.save() /// 닫음
+            print("Pet saved!")
+        } catch {
+            print("Falied to save \(error)")
+        }
+    }
+    
+    // Read (List)
+    func getAllPets() -> [Animal] {
+        let fetchRequest: NSFetchRequest<Animal> = Animal.fetchRequest()
+        do {
+            return try persistentContainer.viewContext.fetch(fetchRequest)
+        } catch {
+            return []
+        }
+    }
+
+    // Delete
+    func deletePet(animal: Animal) {
+        persistentContainer.viewContext.delete(animal)
+        do {
+            try persistentContainer.viewContext.save() /// 닫음
+        } catch {
+            persistentContainer.viewContext.rollback() /// 되돌림
+            print("Failed to save context \(error.localizedDescription)")
+        }
     }
 }
