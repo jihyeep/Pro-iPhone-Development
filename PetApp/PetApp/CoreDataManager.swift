@@ -12,6 +12,10 @@ class CoreDataManager {
     
     init() {
         persistentContainer = NSPersistentContainer(name: "DataModel")
+        
+        // in memory
+        persistentContainer.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
+        
         // 시동 걸기 - 비동기 처리
         persistentContainer.loadPersistentStores { (description, error) in
             if let error = error {
