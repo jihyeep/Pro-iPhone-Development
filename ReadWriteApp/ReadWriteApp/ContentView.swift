@@ -9,25 +9,33 @@ import SwiftUI
 
 struct ContentView: View {
     let placeHolder = "텍스트를 입력하세요."
+    @State var userCreated = false
     @State var createText = "텍스트를 입력하세요."
     @State var displayText = ""
     
+    // 입력에 대한 포커스 상태 변수
     @FocusState var textFieldFocus: Bool
     
+    var textDisabled: Bool {
+        placeHolder == createText && !textFieldFocus
+    }
     var body: some View {
         VStack {
             TextEditor(text: $createText)
-                .foregroundStyle(placeHolder == createText ? .gray : .black)
+                // placeHoler가 표시되어 있으면 텍스트 색상을 회색으로 변경
+                .foregroundStyle(textDisabled ? .gray : .black)
                 .focused($textFieldFocus)
                 .onChange(of: textFieldFocus) {
                     /* textField에 포커스 이동 시 placeHolder가 표시되어 있으면,
                        입력 textField를 초기화하고 입력 대기 상태로 만듦 */
-                    if textFieldFocus, placeHolder == createText {
+                    if textFieldFocus, placeHolder == createText, !userCreated {
                         createText = ""
+                        userCreated = true
                     /* 다른 입력으로 포커스 이동 시 입력한 텍스트가 없으면,
                        placeHoler 기본 텍스트로 대치 */
                     } else if !textFieldFocus, createText.isEmpty {
                         createText = placeHolder
+                        userCreated = false
                     }
                 }            
             HStack {
