@@ -13,7 +13,7 @@ class CoreDataManager {
     init() {
         persistentContainer = NSPersistentContainer(name: "DataModel")
         
-        // in memory
+        // in memory - 재실행하면 사라짐
         persistentContainer.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
         
         // 시동 걸기 - 비동기 처리
