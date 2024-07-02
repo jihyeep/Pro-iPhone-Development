@@ -30,11 +30,18 @@ struct ContentView: View {
             
             List {
                 ForEach(petArray, id: \.self) { pet in
-                    VStack {
+                    VStack(alignment: .leading) {
                         Text(pet.name ?? "")
                         Text(pet.breed ?? "")
                     }
                 }
+                .onDelete(perform: { indexSet in
+                    indexSet.forEach { index in
+                        let pet = petArray[index]
+                        coreDM.deletePet(animal: pet)
+                        displayPets()
+                    }
+                })
             }
         }
         .padding()
