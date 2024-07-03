@@ -40,6 +40,7 @@ struct ContentView: View {
 // 언어 미리보기 설정
 #Preview("기본 - 한국어") {
     ContentView()
+        .environment(\.locale, .init(identifier: "ko-KR"))
 }
 
 #Preview("English") {
