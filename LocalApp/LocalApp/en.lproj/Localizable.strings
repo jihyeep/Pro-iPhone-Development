@@ -5,3 +5,6 @@
   Created by 박지혜 on 7/3/24.
   
 */
+
+"greeting-label" = "Hello, world";
+"button-label" = "Tap me";
