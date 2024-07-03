@@ -10,17 +10,30 @@ import SwiftUI
 struct ContentView: View {
     @State var searchText = ""
     
-    let petArray = ["Cat"]
+    let petArray = ["Cat", "Dog", "Fish", "Donkey", "Canary", "Camel", "Frog"]
     
     var body: some View {
         NavigationStack {
             PetListView(animals: petArray)
+                .navigationTitle("SearchAPp")
         }
-        .searchable(text: $searchText) {
-            ForEach(petArray.filter {
-                $0.hasPrefix(searchText) /// 앞부터 매칭이 되는 것만 필터링
-            }, id: \.self) { name in
-            Text(name)}
+        .navigationBarTitleDisplayMode(.automatic)
+        .searchable(text: $searchText,
+                    placement: .navigationBarDrawer(displayMode: .always), /// 검색바 항상 띄우기
+                    prompt: "Look for a pet") {
+            
+            // suggestions
+            Text("Singing").searchCompletion("Canary")
+            Text("Croaking").searchCompletion("Frog")
+            Text("Grumpy").searchCompletion("Cat")
+            Spacer() // searchable의 리스트를 가려서 검색창을 눌렀을 때도 리스트가 안보이게 됨(아래 !searchText.isEmpty && 도 줘야 함)
+            
+            // 앞부터 매칭이 되는 것만 필터링
+            /// searchText 가 비었을 경우, hasPrefix는 true를 리턴
+            /// -> 배열의 모든 요소가 출력됨
+            ForEach(petArray.filter { !searchText.isEmpty && $0.hasPrefix(searchText) }, id: \.self) { name in
+                Text(name)
+            }
         }
     }
 }
@@ -35,6 +48,8 @@ struct PetListView: View {
     var body: some View {
         List(animals, id: \.self) { animal in
             Text(animal)
+                .background(.yellow)
         }
+//        .listStyle(.plain)
     }
 }
