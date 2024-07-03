@@ -6,5 +6,5 @@
   
 */
 
-"greeting-label" = "안녕하세요.";
+"greeting-label %@" = "안녕하세요. %@";
 "button-label" = "탭 하세요.";
