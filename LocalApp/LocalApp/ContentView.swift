@@ -13,15 +13,24 @@ struct ContentView: View {
 
     var placeHolder: LocalizedStringKey = "placeholder-label"
     
+    let date = Date()
+    let dateFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .long /// full, long, medium, short
+        dateFormatter.timeStyle = .medium /// full, long, medium, short
+        return dateFormatter
+    }()
+    
     var body: some View {
         VStack {
             Text(LocalizedStringKey("greeting-label \(message)"))
-            // Text, Button은 LocalizedStringKey 를 직접 넣을 수 있다.
+            // Text, Button은 LocalizedStringKey 를 직접 넣을 수 있음
             Text("greeting-label \(message)")
             Button("button-label") {
                 changeColor.toggle()
             }
             TextField(placeHolder, text: $message)
+            Text(date, formatter: dateFormatter)
         }
         .padding()
         .background(changeColor ? Color.red : Color.yellow)
