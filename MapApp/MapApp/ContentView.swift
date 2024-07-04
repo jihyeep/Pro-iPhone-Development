@@ -19,12 +19,21 @@ extension CLLocationCoordinate2D {
 
 struct IdentifiablePlace: Identifiable {
     let id: UUID
+    let name: String
     let location: CLLocationCoordinate2D
+    
     init(id: UUID = UUID(), lat: Double, long: Double) {
         self.id = id
+        self.name = ""
         self.location = CLLocationCoordinate2D(
             latitude: lat,
             longitude: long)
+    }
+    
+    init(id: UUID = UUID(), _ name: String, _ location: CLLocationCoordinate2D) {
+        self.id = id
+        self.name = name
+        self.location = location
     }
 }
 
@@ -37,6 +46,13 @@ struct ContentView: View {
         ("노트르담 대성당", .notreDame),
         ("개선문", .arcDeTriomphe),
         ("사크레쾨르 대성당", .sacreCoeur)
+    ]
+    let identifiablePlaces = [
+        IdentifiablePlace("에펠탑", .eiffelTower),
+        IdentifiablePlace("루브르 박물관", .louvre),
+        IdentifiablePlace("노트르담 대성당", .notreDame),
+        IdentifiablePlace("개선문", .arcDeTriomphe),
+        IdentifiablePlace("사크레쾨르 대성당", .sacreCoeur)
     ]
     
     @State var message = "Map of Paris"
@@ -51,16 +67,18 @@ struct ContentView: View {
 //                .mapStyle(.imagery) /// 항공사진
             // Annotation(iOS 17 이전 코드)
             Map(coordinateRegion: $region, annotationItems: [place]) { place in
-                MapMarker(coordinate: place.location, tint: .purple)}
+                // 마커
+//                MapMarker(coordinate: place.location, tint: .purple)
+                // 핀
+                MapPin(coordinate: place.location, tint: .purple)
+            }
             
             // Annotation(iOS 17 이후 코드)
             Map(position: $position) {
-                Annotation("에펠탑", coordinate: .paris) {
-                    Image(systemName: "mappin.circle.fill")
-                        .foregroundStyle(.purple)
-                        .background(.white)
-                        .clipShape(Circle())
-                }
+                // 폴리곤
+                MapPolygon(coordinates: [.paris, .eiffelTower, .louvre])
+                            .stroke(.purple.opacity(0.7), lineWidth: 5)
+                            .foregroundStyle(.purple.opacity(0.7))
                 // 튜플의 0, 1을 의미함
                 ForEach(places, id: \.0) { place in
                     Annotation(place.0, coordinate: place.1) {
@@ -71,8 +89,6 @@ struct ContentView: View {
                     }
                 }
             }
-
-            
             TextEditor(text: $message)
                 .frame(width: .infinity, height: 100)
         }
