@@ -147,6 +147,7 @@ xcuserdata
 ### Secret ###
 *.xcconfig
 
-### Audio, Video ###
+### Large files ###
 *.mp3
 *.mov
+*.pdf
