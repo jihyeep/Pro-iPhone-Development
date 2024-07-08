@@ -11,7 +11,7 @@ import SwiftUI
 struct Speech2TextAppApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            SimpleRecognitionView()
         }
     }
 }

@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  SwiftUIView.swift
 //  Speech2TextApp
 //
 //  Created by 박지혜 on 7/8/24.
@@ -8,36 +8,51 @@
 import SwiftUI
 import Speech
 
-struct ContentView: View {
+struct SpokenCommandRecognitionView: View {
     let audioEngine = AVAudioEngine()
-    let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "ko-KR"))
+    let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
     
     @State var recognitionrequest: SFSpeechAudioBufferRecognitionRequest?
     @State var recognitionTask: SFSpeechRecognitionTask? /// 비동기 task로 동작
     
     @State var message = ""
     @State var buttonStatus = true
+    @State var newColor: Color = .white
     
     var body: some View {
-        VStack {
-            TextEditor(text: $message)
-                            .frame(width: 350, height: 400)
-                        Button(buttonStatus ? "Start recording" : "Stop recording", action: {
-                            buttonStatus.toggle()
-                            if buttonStatus {
-                                stopRecording()
-                            } else {
-                                startRecording()
-                            }
-                        })
-                        .padding()
-                        .background(buttonStatus ? Color.green : Color.red)
+        VStack (spacing: 25) {
+            Button {
+                recognizeSpeech()
+            } label: {
+                Text("Start recording")
+            }
+            TextField("Spoken text appears here", text: $message)
+            Button {
+                message = ""
+                newColor = .white
+                stopSpeech()
+            } label: {
+                Text("Stop recording")
+            }
         }
-        .padding()
-    }
+        .background(newColor)    }
 
     // MARK: - Methods
-    func startRecording() {
+    // 음성 명령
+    func checkSpokenCommand(commandString: String) {
+            switch commandString {
+            case "Purple":
+                newColor = .purple
+            case "Green":
+                newColor = .green
+            case "Yellow":
+                newColor = .yellow
+            default:
+                newColor = .white
+            }
+        }
+    
+    func recognizeSpeech() {
         message = "Start recording"
         // 입력 노드
         /// 마이크 입력
@@ -76,20 +91,22 @@ struct ContentView: View {
             if let result = result {
                 let transcribedString = result.bestTranscription.formattedString
                 message = transcribedString
+                checkSpokenCommand(commandString: transcribedString)
             } else if let error = error {
                 print(error)
             }
         })
     }
     
-    func stopRecording() {
+    func stopSpeech() {
         audioEngine.stop()
+        recognitionrequest?.endAudio()
         recognitionTask?.cancel()
         audioEngine.inputNode.removeTap(onBus: 0)
-        recognitionrequest?.endAudio()
     }
 }
 
 #Preview {
-    ContentView()
+    SpokenCommandRecognitionView()
 }
+
