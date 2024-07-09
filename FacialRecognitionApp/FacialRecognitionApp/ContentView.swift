@@ -20,6 +20,7 @@ struct ContentView: View {
             Image(photoArray[arrayIndex])
                 .resizable()
                 .aspectRatio(contentMode: .fit)
+                .blur(radius: 3.0)
                 .frame(width: 250, height: 250)
             Text(message)
                 .padding()
@@ -30,6 +31,7 @@ struct ContentView: View {
             }.padding()
 
             HStack {
+                Spacer()
                 Button {
                     if arrayIndex == 0 {
                         arrayIndex = photoArray.count - 1
@@ -40,6 +42,7 @@ struct ContentView: View {
                 } label: {
                     Image(systemName: "chevron.left.square.fill")
                 }
+                Spacer()
                 Button {
                     if arrayIndex == photoArray.count - 1 {
                         arrayIndex = 0
@@ -50,6 +53,7 @@ struct ContentView: View {
                 } label: {
                     Image(systemName: "chevron.right.square.fill")
                 }
+                Spacer()
             }
         }
         .padding()
