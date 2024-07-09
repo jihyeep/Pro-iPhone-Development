@@ -39,25 +39,30 @@ struct ContentView: View {
     }
 
     func divideFunction(numerator: Double, denominator: Double) {
-        do {
-            try checkMe(top: numerator, bottom: denominator)
+        // if let과 try?를 이용한 간결한 에러 핸들링
+        if let answer = try? checkMe(top: numerator, bottom: denominator) {
             message = "Answer = \(numerator / denominator)"
-        } catch MajorProblems.divideByZero {
-            message = "Can't divide by zero"
-        } catch MajorProblems.noNegativeNumbersPlease {
-            message = "No negative numbers, please"
-        } catch {
+        } else {
             message = "Some other error occurred"
         }
+        
+        // 복잡한 에러처리 대신 단일 에러 핸들링
+//        do {
+//            try checkMe(top: numerator, bottom: denominator)
+//            message = "Answer = \(numerator / denominator)"
+//        } catch {
+//            message = "Some other error occurred"
+//        }
     }
 
-    func checkMe(top: Double, bottom: Double) throws {
+    func checkMe(top: Double, bottom: Double) throws -> Double {
         guard (bottom != 0) else {
             throw MajorProblems.divideByZero
         }
-        guard (top >= 0 && bottom > 0) else {
+        guard (top > 0 && bottom > 0) else {
             throw MajorProblems.noNegativeNumbersPlease
         }
+        return top / bottom
     }
 }
 
