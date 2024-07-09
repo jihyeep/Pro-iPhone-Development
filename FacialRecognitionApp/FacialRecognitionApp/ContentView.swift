@@ -14,14 +14,15 @@ struct ContentView: View {
     
     @State var message = ""
     @State var arrayIndex = 0
+    @State var newImage: UIImage = UIImage(systemName: "smiley.fill")!
     
     var body: some View {
         VStack {
             Image(photoArray[arrayIndex])
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .blur(radius: 3.0)
-                .frame(width: 250, height: 250)
+            //                .blur(radius: 3.0)
+            //                .frame(width: 500, height: 500)
             Text(message)
                 .padding()
             Button {
@@ -29,7 +30,7 @@ struct ContentView: View {
             } label: {
                 Text("Analyze Image")
             }.padding()
-
+            
             HStack {
                 Spacer()
                 Button {
@@ -61,7 +62,10 @@ struct ContentView: View {
     
     func analyzeImage(image: UIImage) {
         let handler = VNImageRequestHandler(cgImage: image.cgImage!, options: [:])
-        let request = VNDetectFaceRectanglesRequest(completionHandler: handleFaceRecognition)
+        // 단순 얼굴인식
+        //        let request = VNDetectFaceRectanglesRequest(completionHandler: handleFaceRecognition)
+        // 얼굴인식 강조
+        let request = VNDetectFaceLandmarksRequest(completionHandler: handleFaceRecognition)
         try! handler.perform([request])
     }
     
@@ -70,6 +74,41 @@ struct ContentView: View {
             fatalError("Can't find a face in the picture")
         }
         message = "Found \(foundFaces.count) faces in the picture"
+        
+        for faceRectangle in foundFaces {
+            let landmarkRegions: [VNFaceLandmarkRegion2D] = []
+            drawImage(source: newImage, boundary: faceRectangle.boundingBox, faceLandmarkRegions: landmarkRegions)
+        }
+    }
+    
+    // 얼굴인식 사각형 표시
+    func drawImage(source: UIImage, boundary: CGRect, faceLandmarkRegions: [VNFaceLandmarkRegion2D]) {
+        UIGraphicsBeginImageContextWithOptions(source.size, false, 1)
+        
+        let context = UIGraphicsGetCurrentContext()!
+        context.translateBy(x: 0, y: source.size.height)
+        context.scaleBy(x: 1.0, y: -1.0)
+        context.setLineJoin(.round)
+        context.setLineCap(.round)
+        context.setShouldAntialias(true)
+        context.setAllowsAntialiasing(true)
+        
+        let rect = CGRect(x: 0, y: 0, width: source.size.width, height: source.size.height)
+        context.draw(source.cgImage!, in: rect)
+        
+        // 얼굴 주위에 직사각형을 그림
+        let fillColor = UIColor.red
+        fillColor.setStroke()
+        let rectangleWidth = source.size.width * boundary.size.width
+        let rectangleHeight = source.size.height * boundary.size.height
+        
+        context.setLineWidth(8)
+        context.addRect(CGRect(x: boundary.origin.x * source.size.width, y: boundary.origin.y * source.size.height, width: rectangleWidth, height: rectangleHeight))
+        context.drawPath(using: .stroke)
+        
+        let modifiedImage: UIImage = UIGraphicsGetImageFromCurrentImageContext()!
+        UIGraphicsEndImageContext()
+        newImage = modifiedImage
     }
 }
 
